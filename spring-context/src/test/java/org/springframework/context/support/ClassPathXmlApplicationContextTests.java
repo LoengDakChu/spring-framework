@@ -72,6 +72,12 @@ public class ClassPathXmlApplicationContextTests {
 	private static final String ALIAS_FOR_PARENT_CONTEXT = PATH + "aliasForParent.xml";
 	private static final String TEST_PROPERTIES = "test.properties";
 
+	@Test
+	void singleConfigLocationWithObject() {
+		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(SIMPLE_CONTEXT, getClass());
+		User user = (User) ctx.getBean("user");
+		System.out.println(user);
+	}
 
 	@Test
 	void singleConfigLocation() {

@@ -82,6 +82,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @throws BeansException if context creation failed
 	 */
 	public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
+		// spring加载配置文件入口
 		this(new String[] {configLocation}, true, null);
 	}
 
@@ -138,12 +139,36 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
 
+		// 设置父级环境，这里传入的是null
 		super(parent);
+		// 设置配置文件路径
 		setConfigLocations(configLocations);
 		if (refresh) {
+			// 刷新环境
 			refresh();
 		}
 	}
+	//
+	//
+	//
+	//
+	/**
+	 *
+	 * BeanFactory
+	 * 	ListableBeanFactory
+	 * 		ApplicationContext
+	 * 			ConfigurableApplicationContext
+	 * 				AbstractApplicationContext
+	 *
+	 * 			WebApplicationContext
+	 *
+	 * 		ConfigurableListableBeanFactory
+	 * 			DefaultListableBeanFactory
+	 * 				XmlBeanFactory
+	 *
+	 *
+	 *
+	 */
 
 
 	/**
