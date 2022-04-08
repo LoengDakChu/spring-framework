@@ -70,11 +70,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	@Nullable
 	private Boolean allowCircularReferences;
 
-	/** Bean factory for this context. */
+	/** 此上下文的Bean工厂。. */
 	@Nullable
 	private DefaultListableBeanFactory beanFactory;
 
-	/** Synchronization monitor for the internal BeanFactory. */
+	/** 内部BeanFactory的同步监视器. */
 	private final Object beanFactoryMonitor = new Object();
 
 
@@ -122,14 +122,21 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
+		// 如果有BeanFactory
 		if (hasBeanFactory()) {
+			// 则销毁已经创建的bean
 			destroyBeans();
+			// 关闭掉BeanFactory（将其置为null）
 			closeBeanFactory();
 		}
 		try {
+			// 创建默认bean工厂 （DefaultListableBeanFactory）
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			// 设置序列化id
 			beanFactory.setSerializationId(getId());
+			// 定制BeanFactory
 			customizeBeanFactory(beanFactory);
+			// 加载BeanDefinition
 			loadBeanDefinitions(beanFactory);
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
@@ -204,6 +211,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
 	 */
 	protected DefaultListableBeanFactory createBeanFactory() {
+		// 获取内部父Bean工厂创建工厂
 		return new DefaultListableBeanFactory(getInternalParentBeanFactory());
 	}
 
@@ -223,9 +231,18 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
 		if (this.allowBeanDefinitionOverriding != null) {
+			// 设置是否允许它通过注册具有相同名称的不同定义来覆盖bean定义，并自动替换前者。(设置是否允许覆盖同名称不同定义的对象)
+			// 如果不是，将抛出一个异常。这也适用于覆盖别名。
+			// 默认设置是 true。
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
 		if (this.allowCircularReferences != null) {
+			// 设置是否允许bean之间的循环引用—并自动尝试解析它们。(设置是否允许bean之间的循环依赖)
+			// 注意，循环引用解析意味着其中一个涉及的bean将接收到对另一个尚未完全初始化的bean的引用。
+			// 这可能会在初始化时导致微妙的和不那么微妙的副作用;不过，它在很多情况下都很好。
+			// 默认设置是 true。
+			// 关闭此选项将在遇到循环引用时抛出异常，并完全禁止它们。
+			// 注意:通常建议不要依赖于bean之间的循环引用。重构应用程序逻辑，使涉及的两个bean委托给封装它们的公共逻辑的第三个bean
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
 	}

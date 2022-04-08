@@ -196,7 +196,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Create a new DefaultListableBeanFactory with the given parent.
+	 * 用给定的父类创建一个新的DefaultListableBeanFactory
 	 * @param parentBeanFactory the parent BeanFactory
 	 */
 	public DefaultListableBeanFactory(@Nullable BeanFactory parentBeanFactory) {

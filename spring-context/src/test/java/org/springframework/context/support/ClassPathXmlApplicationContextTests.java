@@ -74,6 +74,13 @@ public class ClassPathXmlApplicationContextTests {
 
 
 	@Test
+	public void testSingleConfigLocationBean() {
+		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("simpleSpring.xml");
+		User user = (User) ctx.getBean("user");
+		System.out.println(user);
+	}
+
+	@Test
 	public void testSingleConfigLocation() {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(FQ_SIMPLE_CONTEXT);
 		assertThat(ctx.containsBean("someMessageSource")).isTrue();

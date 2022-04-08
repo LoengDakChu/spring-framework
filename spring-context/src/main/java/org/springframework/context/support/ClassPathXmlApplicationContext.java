@@ -82,6 +82,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @throws BeansException if context creation failed
 	 */
 	public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
+		// 入口
 		this(new String[] {configLocation}, true, null);
 	}
 
@@ -137,10 +138,12 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
-
+		// 设置父级环境对象，这里传入的是null
 		super(parent);
+		// 设置配置文件路径
 		setConfigLocations(configLocations);
 		if (refresh) {
+			// 刷新环境
 			refresh();
 		}
 	}
