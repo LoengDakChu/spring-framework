@@ -234,6 +234,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			// 设置是否允许它通过注册具有相同名称的不同定义来覆盖bean定义，并自动替换前者。(设置是否允许覆盖同名称不同定义的对象)
 			// 如果不是，将抛出一个异常。这也适用于覆盖别名。
 			// 默认设置是 true。
+			// <lookup-method> <replace-method>
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
 		if (this.allowCircularReferences != null) {
