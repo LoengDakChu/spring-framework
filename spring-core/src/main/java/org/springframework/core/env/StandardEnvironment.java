@@ -61,6 +61,10 @@ public class StandardEnvironment extends AbstractEnvironment {
 
 
 	/**
+	 * 自定义属性
+	 * 系统属性：System.getProperty()是获取系统的相关属性，包括文件编码、操作系统名称、区域、用户名等，此属性一般由jyvm自动获取，不能设置。
+	 * 系统环境变量：System.getenv()方法是获取指定的环境变量的值。
+	 *
 	 * Customize the set of property sources with those appropriate for any standard
 	 * Java environment:
 	 * <ul>

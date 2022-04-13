@@ -302,6 +302,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 			}
 			else {
 				// a single resource with the given name
+				// 通过给定的文件名返回一个resource对象
 				return new Resource[] {getResourceLoader().getResource(locationPattern)};
 			}
 		}

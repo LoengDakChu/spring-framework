@@ -216,6 +216,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
+	 * 自定义beanFactory属性，可扩展
 	 * Customize the internal bean factory used by this context.
 	 * Called for each {@link #refresh()} attempt.
 	 * <p>The default implementation applies this context's
