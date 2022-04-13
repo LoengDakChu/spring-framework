@@ -75,6 +75,7 @@ public class XmlValidationModeDetector {
 
 
 	/**
+	 * 指示当前解析位置是否在XML注释中
 	 * Indicates whether or not the current parse position is inside an XML comment.
 	 */
 	private boolean inComment;
@@ -96,9 +97,11 @@ public class XmlValidationModeDetector {
 			String content;
 			while ((content = reader.readLine()) != null) {
 				content = consumeCommentTokens(content);
+
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				// 如果content包含DOCTYPE，则用dtd
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
@@ -108,6 +111,7 @@ public class XmlValidationModeDetector {
 					break;
 				}
 			}
+			// 判断是否用dtd还是xsd验证模式
 			return (isDtdValidated ? VALIDATION_DTD : VALIDATION_XSD);
 		}
 		catch (CharConversionException ex) {
@@ -150,6 +154,7 @@ public class XmlValidationModeDetector {
 	@Nullable
 	private String consumeCommentTokens(String line) {
 		int indexOfStartComment = line.indexOf(START_COMMENT);
+		// 如果是注释的话只能返回
 		if (indexOfStartComment == -1 && !line.contains(END_COMMENT)) {
 			return line;
 		}
