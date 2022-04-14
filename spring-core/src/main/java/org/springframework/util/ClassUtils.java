@@ -248,6 +248,7 @@ public abstract class ClassUtils {
 
 		Assert.notNull(name, "Name must not be null");
 
+		// 通过name 获取 name.class
 		Class<?> clazz = resolvePrimitiveClassName(name);
 		if (clazz == null) {
 			clazz = commonClassCache.get(name);
