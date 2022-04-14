@@ -75,7 +75,7 @@ public class ClassPathXmlApplicationContextTests {
 
 	@Test
 	public void testSingleConfigLocationBean() {
-		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("simpleSpring.xml");
+		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(PATH + "simpleSpring.xml");
 		User user = (User) ctx.getBean("user");
 		System.out.println(user);
 	}

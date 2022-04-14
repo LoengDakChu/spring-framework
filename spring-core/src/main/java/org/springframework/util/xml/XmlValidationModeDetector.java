@@ -154,7 +154,7 @@ public class XmlValidationModeDetector {
 	@Nullable
 	private String consumeCommentTokens(String line) {
 		int indexOfStartComment = line.indexOf(START_COMMENT);
-		// 如果是注释的话只能返回
+		// 如果不是注释的话直接返回
 		if (indexOfStartComment == -1 && !line.contains(END_COMMENT)) {
 			return line;
 		}

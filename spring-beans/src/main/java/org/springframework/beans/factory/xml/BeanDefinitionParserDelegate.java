@@ -412,16 +412,20 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		// 解析id属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		// 解析name属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
-
+		// 如果bean有别名的话，那么将别名分割解析；name=a,b,c,d
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
+		// 将id赋值给beanName
 		String beanName = id;
+		// 如果beanName不等于空并且别名不等于空
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isTraceEnabled()) {
@@ -1379,15 +1383,18 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		// 获取对应的命名空间
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
 			return null;
 		}
+		// 根据命名空间找到对应的NameSpaceHandler
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		// 调用自定义的NameSpaceHandler进行解析
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 
