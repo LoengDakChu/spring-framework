@@ -438,7 +438,7 @@ public class BeanDefinitionParserDelegate {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
-		//
+		// 解析beanDefinition，生成一个完成的BeanDefinition
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
 			// 如果没有指定的beanName，会自动生成一个beanName

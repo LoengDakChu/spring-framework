@@ -67,6 +67,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
 
 	/**
+	 * 为给定的上下文创建一个新的ApplicationContextAwareProcessor
 	 * Create a new ApplicationContextAwareProcessor for the given context.
 	 */
 	public ApplicationContextAwareProcessor(ConfigurableApplicationContext applicationContext) {
@@ -84,14 +85,18 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 			return bean;
 		}
 
+		// 访问控制环境
 		AccessControlContext acc = null;
 
 		if (System.getSecurityManager() != null) {
+			// 获取访问控制环境权限
 			acc = this.applicationContext.getBeanFactory().getAccessControlContext();
 		}
 
 		if (acc != null) {
+			// 利用特权的执行
 			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+				// 调用意识接口
 				invokeAwareInterfaces(bean);
 				return null;
 			}, acc);
@@ -103,6 +108,10 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 		return bean;
 	}
 
+	/**
+	 * 当我们的bean实现了某个Aware接口，这里就会调用相关的set方法为我们的bean设置相关资源
+	 * @param bean 设置完资源的bean
+	 */
 	private void invokeAwareInterfaces(Object bean) {
 		if (bean instanceof EnvironmentAware) {
 			((EnvironmentAware) bean).setEnvironment(this.applicationContext.getEnvironment());

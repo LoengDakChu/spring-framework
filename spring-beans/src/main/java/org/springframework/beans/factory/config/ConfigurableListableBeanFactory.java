@@ -50,6 +50,15 @@ public interface ConfigurableListableBeanFactory
 	void ignoreDependencyType(Class<?> type);
 
 	/**
+	 * 忽略给定的用于自动装配的依赖接口。
+	 * 这通常被应用上下文用来注册以其他方式解析的依赖关系，比如通过BeanFactoryAware解析BeanFactory，或者通过ApplicationContextAware解析ApplicationContext。
+	 * 默认情况下，只有BeanFactoryAware接口被忽略。要忽略其他类型，请为每个类型调用此方法。
+	 *
+	 * 这么做的目的是什么？
+	 * Spring采用的是懒加载方式，当类A中有属性B时，在从容器中获取A对象时会查看属性是否初始化，没有的话会自动初始化B。
+	 * 然而有些情况下是不希望初始化属性B的。
+	 * 例如B实现了BeanNameAware、BeanFactoryAware、BeanClassLoaderAware接口(该接口作用是获取其在容器中的名称、容器、类加载器)。
+	 *
 	 * Ignore the given dependency interface for autowiring.
 	 * <p>This will typically be used by application contexts to register
 	 * dependencies that are resolved in other ways, like BeanFactory through
@@ -149,6 +158,8 @@ public interface ConfigurableListableBeanFactory
 	boolean isConfigurationFrozen();
 
 	/**
+	 * 确保所有非lazy-init单例都被实例化，也要考虑FactoryBeans。如果需要，通常在工厂设置结束时调用。
+	 *
 	 * Ensure that all non-lazy-init singletons are instantiated, also considering
 	 * {@link org.springframework.beans.factory.FactoryBean FactoryBeans}.
 	 * Typically invoked at the end of factory setup, if desired.

@@ -22,6 +22,11 @@ import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
 /**
+ * 应用事件多播器
+ * 由对象实现的接口，这些对象可以管理许多ApplicationListener对象并向它们发布事件。
+ * 一个org.springframework.context。ApplicationEventPublisher，
+ * 通常是Spring org.springframework.context。ApplicationContext，可以使用一个ApplicationEventMulticaster作为一个委托来实际发布事件。
+ *
  * Interface to be implemented by objects that can manage a number of
  * {@link ApplicationListener} objects and publish events to them.
  *

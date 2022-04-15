@@ -73,12 +73,12 @@ public class ClassPathXmlApplicationContextTests {
 	private static final String TEST_PROPERTIES = "test.properties";
 
 
-	@Test
-	public void testSingleConfigLocationBean() {
-		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(PATH + "simpleSpring.xml");
-		User user = (User) ctx.getBean("user");
-		System.out.println(user);
-	}
+//	@Test
+//	public void testSingleConfigLocationBean() {
+//		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(PATH + "simpleSpring.xml");
+//		User user = (User) ctx.getBean("user");
+//		System.out.println(user);
+//	}
 
 	@Test
 	public void testSingleConfigLocation() {

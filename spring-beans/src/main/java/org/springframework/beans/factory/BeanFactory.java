@@ -126,6 +126,12 @@ public interface BeanFactory {
 
 
 	/**
+	 *
+	 * 返回指定bean的实例，该实例可以是共享的，也可以是独立的。
+	 * 这个方法允许Spring BeanFactory作为Singleton或Prototype设计模式的替代品。
+	 * 在Singleton bean的情况下，调用者可以保留对返回对象的引用。 将别名转换回相应的规范bean名。
+	 * 将询问父工厂是否在此工厂实例中找不到bean。
+	 *
 	 * Return an instance, which may be shared or independent, of the specified bean.
 	 * <p>This method allows a Spring BeanFactory to be used as a replacement for the
 	 * Singleton or Prototype design pattern. Callers may retain references to
