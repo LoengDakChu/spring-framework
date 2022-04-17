@@ -119,6 +119,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 	@Override
 	public void onRefresh() {
+		// 实现了Lifecycle的bean处理
 		startBeans(true);
 		this.running = true;
 	}
@@ -137,6 +138,10 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 	// Internal helpers
 
+	/**
+	 * 实现了Lifecycle接口的bean，Spring会保证在启动时调用其start方法，在Spring关闭时调用其stop方法
+	 * @param autoStartupOnly
+	 */
 	private void startBeans(boolean autoStartupOnly) {
 		Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
 		Map<Integer, LifecycleGroup> phases = new HashMap<>();

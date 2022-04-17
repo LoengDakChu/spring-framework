@@ -74,19 +74,45 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
 
-	/** 单例对象的缓存:从bean名称到bean实例. */
+	/**
+	 * 一级缓存，单例对象的缓存:从bean名称到bean实例.
+	 */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-	/** 单例工厂的缓存:ObjectFactory的bean名称. */
+	/** 三级缓存，单例工厂的缓存:ObjectFactory的bean名称. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
-	/** 早期单例对象的缓存:从bean名称到bean实例. */
+	/** 二级缓存，早期单例对象的缓存:从bean名称到bean实例. */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 	/** 已注册单例的集合，按注册顺序包含bean名称. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-	/** 当前正在创建的bean的名称. */
+	/**
+	 * 当前正在创建的bean的名称.
+	 * 用于判断当前是否存在循环依赖
+	 *
+	 * 例子：
+	 * AService Bean的创建过程︰
+	 * 0. singletonsCurrentlyInCreation.add< ' AService'>
+	 * 1，实例化-->AService普通对象--->singletonFactories 'beanName ', () -> getEarlyBeanReference(beanName， mbd，bean)>
+	 * 2．填充bService--->单例池--->创建BService
+	 * 		BService Bean的创建过程∶
+	 * 		2.1 实例化-->BService对象
+	 * 		2.2填充aService--->单例池--->判断singletonsCurrentlyInCreation是否存在正在创建的a--->循环依赖---->二级缓存(earlySingletonObjects)
+	 * 			--->AOP--->从第三级缓存获取普通对象，创建AService代理对象--->把代理对象放到第二级缓存里面
+	 * 		2.2填充aService-->单例池-->creategingSet-->循环依赖-->earlysingleton0bjects
+	 * 			-->singletonFactories-->lambda-->执行(AOP)-->AService代理对象--earlySingletonObjects
+	 * 		2.3填充其他属性
+	 * 		2.4其他步骤
+	 * 		2.5 加入单例池
+	 * 3．填充其他属性
+	 * 4．其他步骤(AoP） --->@Async--->代理对象
+	 * 4.5 earlySingleton0bjects-->AService普通对象
+	 * 5. 加入单例池
+	 * 6. singletonsCurrentlyInCreation.remove< ' AService'>
+	 *
+	 * */
 	private final Set<String> singletonsCurrentlyInCreation =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
@@ -144,6 +170,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 如果需要，添加给定的单例工厂来构建指定的单例。 为单例的快速注册调用，例如能够解析循环引用。
+	 *
 	 * Add the given singleton factory for building the specified singleton
 	 * if necessary.
 	 * <p>To be called for eager registration of singletons, e.g. to be able to
@@ -169,6 +197,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 从第一、第二、第三级缓存获取
 	 * Return the (raw) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
@@ -397,6 +426,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 为给定的bean注册一个依赖的bean，在给定的bean被销毁之前销毁它。
 	 * Register a dependent bean for the given bean,
 	 * to be destroyed before the given bean is destroyed.
 	 * @param beanName the name of the bean
@@ -421,6 +451,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 确定指定的依赖bean是否已被注册为依赖于给定的bean或其任何传递依赖项。
 	 * Determine whether the specified dependent bean has been registered as
 	 * dependent on the given bean or on any of its transitive dependencies.
 	 * @param beanName the name of the bean to check

@@ -1412,6 +1412,7 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele) {
+		// 解析自定义元素
 		return parseCustomElement(ele, null);
 	}
 

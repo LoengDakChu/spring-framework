@@ -286,6 +286,9 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	Object initializeBean(Object existingBean, String beanName) throws BeansException;
 
 	/**
+	 * 将BeanPostProcessors应用到给定的现有bean实例，调用它们的postProcessBeforeInitialization方法。
+	 * 返回的bean实例可能是原始bean的包装器。
+	 *
 	 * Apply {@link BeanPostProcessor BeanPostProcessors} to the given existing bean
 	 * instance, invoking their {@code postProcessBeforeInitialization} methods.
 	 * The returned bean instance may be a wrapper around the original.

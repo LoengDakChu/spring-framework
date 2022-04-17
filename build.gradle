@@ -279,6 +279,7 @@ configure(allprojects) { project ->
 			mavenCentral()
 			maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
 			maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+			maven { url 'https://repo.springsource.org/plugins-release' }
 		}
 	}
 	configurations.all {
