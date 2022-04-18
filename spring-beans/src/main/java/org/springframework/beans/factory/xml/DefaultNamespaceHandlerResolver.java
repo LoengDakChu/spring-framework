@@ -65,7 +65,11 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	/** Resource location to search for. */
 	private final String handlerMappingsLocation;
 
-	/** Stores the mappings from namespace URI to NamespaceHandler class name / instance. */
+	/**
+	 * 存储从名称空间URI到NamespaceHandler类名称实例的映射
+	 *
+	 * Stores the mappings from namespace URI to NamespaceHandler class name / instance.
+	 * */
 	@Nullable
 	private volatile Map<String, Object> handlerMappings;
 
@@ -115,7 +119,9 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	@Override
 	@Nullable
 	public NamespaceHandler resolve(String namespaceUri) {
+		// 获取命名空间对应的处理器Mapping
 		Map<String, Object> handlerMappings = getHandlerMappings();
+		// 获取对应的处理器
 		Object handlerOrClassName = handlerMappings.get(namespaceUri);
 		if (handlerOrClassName == null) {
 			return null;
@@ -126,12 +132,15 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 		else {
 			String className = (String) handlerOrClassName;
 			try {
+				// 获取处理器字节码文件
 				Class<?> handlerClass = ClassUtils.forName(className, this.classLoader);
 				if (!NamespaceHandler.class.isAssignableFrom(handlerClass)) {
 					throw new FatalBeanException("Class [" + className + "] for namespace [" + namespaceUri +
 							"] does not implement the [" + NamespaceHandler.class.getName() + "] interface");
 				}
+				// 实例化具体处理器
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
+				// 初始化具体处理器重写方法
 				namespaceHandler.init();
 				handlerMappings.put(namespaceUri, namespaceHandler);
 				return namespaceHandler;

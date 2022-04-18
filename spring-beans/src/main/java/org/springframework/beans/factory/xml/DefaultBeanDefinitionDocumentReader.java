@@ -179,6 +179,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				// 判断节点是否是元素，如 bean
 				if (node instanceof Element) {
 					Element ele = (Element) node;
+					// 判断是否为默认命名空间 http://www.springframework.org/schema/beans
 					if (delegate.isDefaultNamespace(ele)) {
 						parseDefaultElement(ele, delegate);
 					}

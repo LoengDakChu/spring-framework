@@ -94,7 +94,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 *
 	 * 例子：
 	 * AService Bean的创建过程︰
-	 * 0. singletonsCurrentlyInCreation.add< ' AService'>
+	 * 0. 先从单例池中找，找不到准备开始创建，在单例创建执行之前，将bean添加到正在创建的bean集合中singletonsCurrentlyInCreation
 	 * 1，实例化-->AService普通对象--->singletonFactories 'beanName ', () -> getEarlyBeanReference(beanName， mbd，bean)>
 	 * 2．填充bService--->单例池--->创建BService
 	 * 		BService Bean的创建过程∶
@@ -109,8 +109,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * 3．填充其他属性
 	 * 4．其他步骤(AoP） --->@Async--->代理对象
 	 * 4.5 earlySingleton0bjects-->AService普通对象
-	 * 5. 加入单例池
-	 * 6. singletonsCurrentlyInCreation.remove< ' AService'>
+	 * 5. singletonsCurrentlyInCreation.remove< ' AService'>
+	 * 6. 加入单例池
 	 *
 	 * */
 	private final Set<String> singletonsCurrentlyInCreation =
@@ -236,6 +236,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		Assert.notNull(beanName, "Bean name must not be null");
 		synchronized (this.singletonObjects) {
 			Object singletonObject = this.singletonObjects.get(beanName);
+			// 从单例池中找不到
 			if (singletonObject == null) {
 				if (this.singletonsCurrentlyInDestruction) {
 					throw new BeanCreationNotAllowedException(beanName,
@@ -245,6 +246,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				// 在单例创建执行之前，将bean添加到正在创建的bean集合中singletonsCurrentlyInCreation
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -252,6 +254,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+					// 执行lambda表达式(创建bean，createBean(beanName, mbd, args))
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -275,9 +278,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					// 在单例创建执行之后，将bean移除在正在创建的bean集合中singletonsCurrentlyInCreation
 					afterSingletonCreation(beanName);
 				}
+				// 新的单例
 				if (newSingleton) {
+					// 放到单例池
 					addSingleton(beanName, singletonObject);
 				}
 			}
