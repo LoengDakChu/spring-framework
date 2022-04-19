@@ -101,13 +101,13 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 	protected ClassPathBeanDefinitionScanner configureScanner(ParserContext parserContext, Element element) {
 		boolean useDefaultFilters = true;
-		// use-default-filters属性，默认为true
+		// use-default-filters属性，默认为true，过滤器主要是过滤注解，如@Component
 		if (element.hasAttribute(USE_DEFAULT_FILTERS_ATTRIBUTE)) {
 			useDefaultFilters = Boolean.parseBoolean(element.getAttribute(USE_DEFAULT_FILTERS_ATTRIBUTE));
 		}
 
 		// Delegate bean definition registration to scanner class.
-		// 将bean定义注册委托给扫描器类。
+		// 注册扫描类，将bean定义注册委托给扫描器类
 		ClassPathBeanDefinitionScanner scanner = createScanner(parserContext.getReaderContext(), useDefaultFilters);
 		scanner.setBeanDefinitionDefaults(parserContext.getDelegate().getBeanDefinitionDefaults());
 		scanner.setAutowireCandidatePatterns(parserContext.getDelegate().getAutowireCandidatePatterns());
