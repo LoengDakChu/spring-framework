@@ -113,6 +113,13 @@ import org.springframework.util.ReflectionUtils;
 public class SpringServletContainerInitializer implements ServletContainerInitializer {
 
 	/**
+	 *
+	 * servlet 3.0 版本以后 提出来一个新规范 SPI，web容器会在启动的时候，去调用onStartup() ServletContext web上下文对象
+	 * "你"（这里指spring）的项目里面，如果有某些类或者某些方法，需要在启动的时候被Tomcat(web容器)调用的话
+	 * 首先，你在你的项目的根目录的 META-INF/services/javax.servlet.ServletContainerInitializer目录下建立一个文件，内容就是实现ServletContainerInitializer的实现类全路径名字
+	 * 在实现类上加@HandlesTypes注解表示启动的时候把@HandlesTypes上的类所有的子类都进行实例化，遍历执行onStartUp方法，这里的子类是WebApplicationInitializer，所以启动的时候会执行
+	 * WebApplicationInitializer的实现类的onStartUp方法
+	 *
 	 * Delegate the {@code ServletContext} to any {@link WebApplicationInitializer}
 	 * implementations present on the application classpath.
 	 * <p>Because this class declares @{@code HandlesTypes(WebApplicationInitializer.class)},
@@ -145,12 +152,15 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 		List<WebApplicationInitializer> initializers = new LinkedList<>();
 
 		if (webAppInitializerClasses != null) {
+			// 循环WebApplicationInitializer以及子类
 			for (Class<?> waiClass : webAppInitializerClasses) {
 				// Be defensive: Some servlet containers provide us with invalid classes,
 				// no matter what @HandlesTypes says...
+				// 如果不是接口、不是抽象类 并且是WebApplicationInitializer，把它实例化
 				if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) &&
 						WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
 					try {
+						// 实例化，并添加到initializers
 						initializers.add((WebApplicationInitializer)
 								ReflectionUtils.accessibleConstructor(waiClass).newInstance());
 					}
@@ -168,6 +178,7 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 
 		servletContext.log(initializers.size() + " Spring WebApplicationInitializers detected on classpath");
 		AnnotationAwareOrderComparator.sort(initializers);
+		// 遍历启动所有的WebApplicationInitializer
 		for (WebApplicationInitializer initializer : initializers) {
 			initializer.onStartup(servletContext);
 		}

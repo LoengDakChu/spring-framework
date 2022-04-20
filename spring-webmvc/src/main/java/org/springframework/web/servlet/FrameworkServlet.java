@@ -981,6 +981,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	/**
+	 * 处理这个请求，发布一个事件，不管结果如何。 实际的事件处理由抽象的doService模板方法执行
+	 *
 	 * Process this request, publishing an event regardless of the outcome.
 	 * <p>The actual event handling is performed by the abstract
 	 * {@link #doService} template method.
@@ -1003,6 +1005,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
+			// 处理请求
 			doService(request, response);
 		}
 		catch (ServletException | IOException ex) {

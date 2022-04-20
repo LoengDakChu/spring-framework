@@ -323,11 +323,34 @@ public class DispatcherServlet extends FrameworkServlet {
 	@Nullable
 	private ThemeResolver themeResolver;
 
-	/** List of HandlerMappings used by this servlet. */
+	/**
+	 * 处理器映射器
+	 * 启动的时候默认创建 RequestMappingHandlerMapping、BeanNameUrlHandlerMapping
+	 *
+	 * List of HandlerMappings used by this servlet.
+	 *
+	 * Controller定义的方式有 2 种类型和 3 种实现
+	 * 2种类型：BeanName类型 和 @Controller类型
+	 * 3种实现：实现HttpRequestHandler 实现Controller 加@Controller
+	 *
+	 * 实现HttpRequestHandler、实现Controller属于BeanName类型
+	 * 加@Controller属于@Controller类型
+	 *
+	 */
 	@Nullable
 	private List<HandlerMapping> handlerMappings;
 
-	/** List of HandlerAdapters used by this servlet. */
+	/**
+	 * 处理器适配器
+	 * List of HandlerAdapters used by this servlet.
+	 *
+	 * 一下是handlerMapping对应的适配器
+	 *
+	 * 实现HttpRequestHandler ——>  HttpRequestHandlerAdapter
+	 * 实现Controller		 ——>  SimpleControllerHandlerAdapter
+	 * 加@Controller		 ——>  RequestMappingHandlerAdapter
+	 *
+	 */
 	@Nullable
 	private List<HandlerAdapter> handlerAdapters;
 
@@ -343,7 +366,10 @@ public class DispatcherServlet extends FrameworkServlet {
 	@Nullable
 	private FlashMapManager flashMapManager;
 
-	/** List of ViewResolvers used by this servlet. */
+	/**
+	 * 视图解析器
+	 * List of ViewResolvers used by this servlet.
+	 */
 	@Nullable
 	private List<ViewResolver> viewResolvers;
 
@@ -940,6 +966,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 
 		try {
+			// 处理请求调度，HandleMapping、HandleAdapter、ViewResolver
 			doDispatch(request, response);
 		}
 		finally {
@@ -1009,10 +1036,12 @@ public class DispatcherServlet extends FrameworkServlet {
 			Exception dispatchException = null;
 
 			try {
+				// 检查文件上传
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
+				// 获取处理器映射器
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
@@ -1020,6 +1049,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Determine handler adapter for the current request.
+				// 获取处理器适配器
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -1032,11 +1062,13 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
+				// HandlerInterceptor前置处理
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
 
 				// Actually invoke the handler.
+				// 处理器适配器开始处理由处理器映射器返回的handler，返回视图解析器
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
@@ -1044,6 +1076,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				applyDefaultViewName(processedRequest, mv);
+				// HandlerInterceptor后置处理
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1054,6 +1087,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
+			// 处理调度结果，视图解析器解析，渲染数据，响应渲染后的结果
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
