@@ -139,6 +139,9 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	}
 
 	/**
+	 *
+	 * 获取方法参数
+	 *
 	 * Get the method argument values for the current request, checking the provided
 	 * argument values and falling back to the configured argument resolvers.
 	 * <p>The resulting array will be passed into {@link #doInvoke}.

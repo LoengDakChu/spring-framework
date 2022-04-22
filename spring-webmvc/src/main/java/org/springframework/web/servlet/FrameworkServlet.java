@@ -524,10 +524,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		if (logger.isInfoEnabled()) {
 			logger.info("Initializing Servlet '" + getServletName() + "'");
 		}
+		// 记录开始时间
 		long startTime = System.currentTimeMillis();
 
 		try {
+			// 初始化web应用上下文
 			this.webApplicationContext = initWebApplicationContext();
+			// 默认空实现，留给子类扩展一些自定义的初始化需求
 			initFrameworkServlet();
 		}
 		catch (ServletException | RuntimeException ex) {
@@ -562,6 +565,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		WebApplicationContext wac = null;
 
+		// 这个 if 判断内的初始化逻辑，在上文已经介绍过
 		if (this.webApplicationContext != null) {
 			// A context instance was injected at construction time -> use it
 			wac = this.webApplicationContext;
@@ -584,10 +588,12 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			// has been registered in the servlet context. If one exists, it is assumed
 			// that the parent context (if any) has already been set and that the
 			// user has performed any initialization such as setting the context id
+			// 如果上下文为空则尝试从用户配置的 contextAttribute 属性加载 WebApplicationContext，这里要保证 WebApplicationContext 已经加载并存入 ServiceContext 中
 			wac = findWebApplicationContext();
 		}
 		if (wac == null) {
 			// No context instance is defined for this servlet -> create a local one
+			// 如果到这里上下文还是为空则创建本地默认的 XmlWebApplicationContext，创建和初始化过程与上文讲述的过程非常相似
 			wac = createWebApplicationContext(rootContext);
 		}
 
@@ -596,6 +602,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			// support or the context injected at construction time had already been
 			// refreshed -> trigger initial onRefresh manually here.
 			synchronized (this.onRefreshMonitor) {
+				// 默认子类实现初始化一些 servlet 需要的对象
 				onRefresh(wac);
 			}
 		}
@@ -603,6 +610,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		if (this.publishContext) {
 			// Publish the context as a servlet context attribute.
 			String attrName = getServletContextAttributeName();
+			// 将上下文对象设置到 ServletContext 的属性中
 			getServletContext().setAttribute(attrName, wac);
 		}
 
@@ -990,22 +998,27 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// 记录请求处理开始时间
 		long startTime = System.currentTimeMillis();
 		Throwable failureCause = null;
 
+		// 提取当前线程的 LocaleContext
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+		// 构建国际化语言环境
 		LocaleContext localeContext = buildLocaleContext(request);
-
+		// 提取当前线程的 RequestAttributes
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
+		// 封装请求参数
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
-
+		// 构建异步请求管理器，异步请求是 Spring3.2 版本的新特性
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+		// 注册 Callable 拦截器
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
-
+		// 保存到当前线程，保证当前线程的请求还能获取到
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
-			// 处理请求
+			// 子类具体实现处理请求逻辑
 			doService(request, response);
 		}
 		catch (ServletException | IOException ex) {
