@@ -556,18 +556,25 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Override
 	public void afterPropertiesSet() {
 		// Do this first, it may add ResponseBody advice beans
+		// 初始化 ControllerAdvice 缓存
 		initControllerAdviceCache();
 
 		if (this.argumentResolvers == null) {
+			// 获取默认参数解析器
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
+			// 封装到组合类中
 			this.argumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
 		}
 		if (this.initBinderArgumentResolvers == null) {
+			// 获取默认参数绑定解析器，这里添加的解析器已经添加到了默认参数解析器的集合中，这里是为了区分出用于参数绑定的解析器
 			List<HandlerMethodArgumentResolver> resolvers = getDefaultInitBinderArgumentResolvers();
+			// 封装到组合类中
 			this.initBinderArgumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
 		}
 		if (this.returnValueHandlers == null) {
+			// 获取默认方法返回值解析器，这里添加的解析器已经添加到了默认参数解析器的集合中，这里是为了区分出用于解析方法返回值的解析器
 			List<HandlerMethodReturnValueHandler> handlers = getDefaultReturnValueHandlers();
+			// 封装到组合类中
 			this.returnValueHandlers = new HandlerMethodReturnValueHandlerComposite().addHandlers(handlers);
 		}
 	}
@@ -577,6 +584,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			return;
 		}
 
+		// 获取@ControllerAdvice注解的beanName，并封装到ControllerAdviceBean中
 		List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
 
 		List<Object> requestResponseBodyAdviceBeans = new ArrayList<>();
@@ -586,14 +594,19 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			if (beanType == null) {
 				throw new IllegalStateException("Unresolvable type for ControllerAdviceBean: " + adviceBean);
 			}
+			// 获取@ModelAttribute注解的方法
 			Set<Method> attrMethods = MethodIntrospector.selectMethods(beanType, MODEL_ATTRIBUTE_METHODS);
 			if (!attrMethods.isEmpty()) {
+				// 记录到相应缓存中
 				this.modelAttributeAdviceCache.put(adviceBean, attrMethods);
 			}
+			// 获取@InitBinder注解的方法
 			Set<Method> binderMethods = MethodIntrospector.selectMethods(beanType, INIT_BINDER_METHODS);
 			if (!binderMethods.isEmpty()) {
+				// 记录到相应缓存中
 				this.initBinderAdviceCache.put(adviceBean, binderMethods);
 			}
+			// RequestBodyAdvice类型bean的记录
 			if (RequestBodyAdvice.class.isAssignableFrom(beanType) || ResponseBodyAdvice.class.isAssignableFrom(beanType)) {
 				requestResponseBodyAdviceBeans.add(adviceBean);
 			}

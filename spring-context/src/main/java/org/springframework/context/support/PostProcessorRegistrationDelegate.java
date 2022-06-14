@@ -41,6 +41,10 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.lang.Nullable;
 
 /**
+ *
+ * PostProcessorRegistrationDelegate是一个标记为final的类，表示不可以修改，其中的方法均是静态方法，权限访问修饰符为默认的，可以将其当做一个工具类，
+ * 在spring的AbstractApplicationContext类中会调用到这个工具类：用来注册和调用BeanFactory后置处理、注册Bean后置处理器。
+ *
  * Delegate for AbstractApplicationContext's post-processor handling.
  *
  * @author Juergen Hoeller
@@ -53,12 +57,19 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 
+	/**
+	 * 实例化并调用BeanFactory的后置处理器BeanFactoryPostProcessor，扫描bean定义并注册bean定义
+	 * @param beanFactory
+	 * @param beanFactoryPostProcessors
+	 */
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 		Set<String> processedBeans = new HashSet<>();
 
+		// 只有此 beanFactory 是 BeanDefinitionRegistry 才能执行 BeanDefinitionRegistryPostProcessor，才能修改 Bean 的定义
+		// BeanDefinitionRegistry就是用于将BeanDefinition注册到spring容器中,即添加到beanDefinitionMap(Map<String, BeanDefinition>)
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
@@ -95,8 +106,10 @@ final class PostProcessorRegistrationDelegate {
 					processedBeans.add(ppName);
 				}
 			}
+			// 排序
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
 			registryProcessors.addAll(currentRegistryProcessors);
+			// 调用PostProcess的postProcessBeanDefinitionRegistry方法
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
 
