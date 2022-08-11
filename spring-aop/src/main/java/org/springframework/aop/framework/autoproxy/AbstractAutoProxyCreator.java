@@ -457,10 +457,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		ProxyFactory proxyFactory = new ProxyFactory();
+		// 复制当前对象的相关属性
 		proxyFactory.copyFrom(this);
 
 		if (!proxyFactory.isProxyTargetClass()) {
 			if (shouldProxyTargetClass(beanClass, beanName)) {
+				// proxy-target-class配置  cglib
 				proxyFactory.setProxyTargetClass(true);
 			}
 			else {
@@ -469,6 +471,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
+		// 加入匹配的增强器
 		proxyFactory.addAdvisors(advisors);
 		proxyFactory.setTargetSource(targetSource);
 		customizeProxyFactory(proxyFactory);
@@ -478,6 +481,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			proxyFactory.setPreFiltered(true);
 		}
 
+		// 创建代理
 		return proxyFactory.getProxy(getProxyClassLoader());
 	}
 

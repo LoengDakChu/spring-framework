@@ -76,6 +76,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 						match = mm.matches(method, actualClass);
 					}
 					if (match) {
+						// 获取方法拦截器数组
 						MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
 						if (mm.isRuntime()) {
 							// Creating a new object instance in the getInterceptors() method
@@ -90,6 +91,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 					}
 				}
 			}
+			// 引介增强处理
 			else if (advisor instanceof IntroductionAdvisor) {
 				IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
 				if (config.isPreFiltered() || ia.getClassFilter().matches(actualClass)) {

@@ -148,6 +148,7 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 
 		@Override
 		protected boolean isEligibleBean(String beanName) {
+			// 是否是合适的被代理bean
 			return AnnotationAwareAspectJAutoProxyCreator.this.isEligibleAspectBean(beanName);
 		}
 	}
