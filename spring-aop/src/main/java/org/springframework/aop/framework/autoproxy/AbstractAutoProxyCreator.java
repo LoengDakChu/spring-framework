@@ -249,6 +249,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
+			// 如果是aop的基础类不需要代理，或者配置了bean不需要代理，直接返回
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -337,17 +338,20 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
+		// advisedBeans为false，不生成代理对象；如切面类
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
+		// 如果是aop的基础类不需要代理，或者配置了bean不需要代理，直接返回
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
 		}
 
 		// Create proxy if we have advice.
+		// 获取bean匹配的增强器，包括切面织入方法、事务
 		// 判断当前bean是否存在匹配的advice，如果存在则要生成一个代理对象
-		// 此处根据类以及类中的方法去匹配到Interceptor〈也就是Advice)，然后生成代理对象，代理对象在执行的时候，还会根据当前执行的方法去匹配
+		// 此处根据类以及类中的方法去匹配到Interceptor（也就是Advice)，然后生成代理对象，代理对象在执行的时候，还会根据当前执行的方法去匹配
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
 			// advisedBeans记录了某个Bean己经进行过AOP了

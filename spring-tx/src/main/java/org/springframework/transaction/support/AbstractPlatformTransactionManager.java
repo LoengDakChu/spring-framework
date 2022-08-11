@@ -330,6 +330,15 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	//---------------------------------------------------------------------
 
 	/**
+	 * AbstractPlatformTransactionManager#getTransaction()来处理事务的准备工作，包括事务获取以及信息的构建，主要流程：
+	 * 1.获取事务
+	 * 2.如果当前线程存在事务则转向嵌套事务的处理
+	 * 3.事务超时设置验证
+	 * 4.事务传播机制校验
+	 * 5.构建 DefaultTransactionStatus
+	 * 6.完善 transaction，包括设置 ConnectionHolder、 隔离级别、 timeout，如果是新连接，则绑定到当前线程
+	 *
+	 *
 	 * This implementation handles propagation behavior. Delegates to
 	 * {@code doGetTransaction}, {@code isExistingTransaction}
 	 * and {@code doBegin}.
@@ -344,20 +353,29 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		// Use defaults if no transaction definition given.
 		TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
 
+		// 1.获取事务
+		// 调用DataSourceTransactionManager#doGetTransaction()
+		// 创建基于JDBC的事务实例：DataSourceTransactionObject
 		Object transaction = doGetTransaction();
 		boolean debugEnabled = logger.isDebugEnabled();
 
+		// 2.当先线程存在事务，处理嵌套事务
+		// 2.1判断当前线程是否存在事务，判断依据为当前线程记录的连接不为空且连接中(connectionHolder) 中的transactionActive属性不为空
 		if (isExistingTransaction(transaction)) {
 			// Existing transaction found -> check propagation behavior to find out how to behave.
 			return handleExistingTransaction(def, transaction, debugEnabled);
 		}
 
 		// Check definition settings for new transaction.
+		// 3.事务超时设置验证
 		if (def.getTimeout() < TransactionDefinition.TIMEOUT_DEFAULT) {
 			throw new InvalidTimeoutException("Invalid transaction timeout", def.getTimeout());
 		}
 
 		// No existing transaction found -> check propagation behavior to find out how to proceed.
+		// 4.事务传播机制校验
+		// 当前线程不存在事务，但是传播机制设置为MANDATORY，则会抛出异常
+		// MANDATORY：当前存在事务，则加入当前事务，如果当前事务不存在，则抛出异常
 		if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_MANDATORY) {
 			throw new IllegalTransactionStateException(
 					"No existing transaction found for transaction marked with propagation 'mandatory'");
